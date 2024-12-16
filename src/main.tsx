@@ -14,20 +14,19 @@ const sdkOptions = {
   logging: {
     developerMode: false
   },
+  forceInjectedProvider: true,
   openDeeplink(link: string) {
     const isInIframe = window !== window.parent;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     
     if (isInIframe && isIOS) {
-      console.log(`deeplink attempted in iframe+iOS: ${link}, isSafari: ${isSafari}`);
+      console.log(`deeplink attempted in iframe+iOS: ${link}`);
       
-      // Notify parent frame first
-      window.parent.postMessage({ type: 'OPEN_DEEPLINK', link }, '*');
-      
-      // Use window.open consistently for both browsers
-      const newWindow = window.open(link, '_blank');
-      console.log('Attempted window.open:', newWindow);
+      // Send both the deeplink request and ethereum status
+      window.parent.postMessage({ 
+        type: 'OPEN_DEEPLINK', 
+        link,
+      }, '*');
       
     } else {
       window.open(link, '_blank');

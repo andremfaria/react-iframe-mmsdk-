@@ -18,14 +18,85 @@
 
 <body>
     <div>
-            <h1>IFRAME:</h1>
-       <center> 
-        <iframe 
-            sandbox="allow-same-origin allow-top-navigation allow-scripts allow-popups allow-popups-to-escape-sandbox" 
-            style="border:2px solid blue;" 
-            id="iframe" src="/">
-        </iframe>
+        <h1>IFRAME:</h1>
+        <center> 
+            <iframe 
+                sandbox="allow-same-origin allow-top-navigation allow-scripts allow-popups allow-popups-to-escape-sandbox" 
+                style="border:2px solid blue;" 
+                id="iframe" src="/">
+            </iframe>
+        </center>
     </div>
+
+    <script>
+        // This is the index simulating MM Card embedding the iframe
+        // Please do review the sandbox items as the focus of this demo is to 
+        // show how to handle deeplinks in an iframe
+
+        // This prevents from deeplinking from a state where the message was 
+        // exchanged prior to creating the session
+        const checkSdkCommAsync = () => {
+            return new Promise((resolve) => {
+                // These can most likely be reduced
+                const maxCheck = 10;
+                let checkCount = 0;
+
+                function storageCheck() {
+                    const sdkComm = localStorage.getItem('.sdk-comm');
+                    let isSdkCommValid = false;
+                    if (sdkComm) {
+                        try {
+                            const sdkCommObj = JSON.parse(sdkComm);
+                            if (sdkCommObj.channelId && 
+                                sdkCommObj.localKey && 
+                                sdkCommObj.validUntil) {
+                                isSdkCommValid = true;
+                            }
+                        } catch (e) {
+                            console.error('Error parsing .sdk-comm:', e);
+                        }
+                    }
+
+                    if (isSdkCommValid) {
+                        resolve(true);
+                    } else if (checkCount < maxCheck) {
+                        checkCount++;
+                        setTimeout(storageCheck, 1000);
+                    } else {
+                        resolve(false);
+                    }
+                }
+
+                storageCheck();
+            });
+        }
+
+        window.addEventListener('message', async function(event) {
+            const hasSession = await checkSdkCommAsync();
+            
+            if (hasSession) {
+                if (event.data.type === 'OPEN_DEEPLINK') {
+                    if (event.data.link === '') {
+                        return;
+                    }
+
+                    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+                    
+                    // handle deeplink for iOS Safari
+                    if (isIOS && isSafari) {
+                        // href has higher priority than window.open
+                        window.location.href = event.data.link;
+                    } else {
+                        // For other browsers: Use window.open
+                        window.open(event.data.link, '_blank');
+                    }
+                }
+            } else {
+                console.log('No session found, failed to load completely');
+            }
+        });
+    </script>
 </body>
 
 </html>

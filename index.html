@@ -9,5 +9,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // This is the main index for the dapp runing inside the iframe
+
+      // With this we're force hidrating the browser with an empty link
+      window.parent.postMessage({ 
+        type: 'OPEN_DEEPLINK', 
+        link: '',
+      }, '*');
+    </script>
   </body>
 </html>

@@ -112,23 +112,6 @@ export const App = () => {
     setResponse('Terminated');
   };
 
-  const connectWithSwitchChain = async () => {
-    const rpc = {
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: lineaChainId }],
-    };
-    try {
-      await sdk?.connectWith(rpc);
-    } catch (err) {
-      if (err instanceof Object) {
-        setResponse(JSON.stringify(err));
-        return;
-      }
-      setResponse(err);
-      console.error(err); 
-    }
-  };
-
   const handleSwitchChain = async () => {
     if (!provider) {
       console.error('Provider is not available');
@@ -196,9 +179,6 @@ export const App = () => {
         <div className="Button-Container">
           <button className={'Button-Normal'} style={{ padding: 10, margin: 10 }} onClick={connect}>
             Connect
-          </button>
-          <button className={'Button-Normal'} style={{ padding: 10, margin: 10 }} onClick={connectWithSwitchChain}>
-            Connect + switch to Linea
           </button>
         </div>
       )}
