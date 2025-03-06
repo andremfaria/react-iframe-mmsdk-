@@ -19,16 +19,32 @@ const sdkOptions = {
     const isInIframe = window !== window.parent;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     
-    if (isInIframe && isIOS) {
-      console.log(`deeplink attempted in iframe+iOS: ${link}`);
-      
-      // Send both the deeplink request and ethereum status
+    // please ignore this bypasses to the window.ethereum object 
+    // @ts-expect-error @metamask/sdk-react 
+    const hasEthereum = typeof window.ethereum !== 'undefined';
+    
+    // please ignore this bypasses to the window.ethereum object
+    // @ts-expect-error @metamask/sdk-react 
+    const isMetaMaskInApp = hasEthereum && window.ethereum?.isMetaMask === true;
+    
+    // Check if we're in actual MetaMask app - not just with an injected provider
+    const isActualMetaMaskApp = isMetaMaskInApp && /MetaMask/i.test(navigator.userAgent);
+
+    // First check if we're in the actual MetaMask app
+    if (isActualMetaMaskApp) {
+      window.location.href = link;
+      console.log(`deeplink attempted in actual MetaMask app: ${link}`);
+    } 
+    // Then handle iOS Safari in iframe case
+    else if (isIOS && isInIframe) {
+      console.log(`deeplink attempted in iframe+iOS Safari: ${link}`);
       window.parent.postMessage({ 
         type: 'OPEN_DEEPLINK', 
         link,
       }, '*');
-      
-    } else {
+    } 
+    // Default fallback for all other cases
+    else {
       window.open(link, '_blank');
       console.log(`deeplink attempted in normal mode: ${link}`);
     }
