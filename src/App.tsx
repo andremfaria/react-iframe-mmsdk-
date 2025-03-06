@@ -142,6 +142,8 @@ export const App = () => {
         <p>{`Account balance: ${balance ?? ''}`}</p>
         <p>{`Last request response: ${response ?? ''}`}</p>
         <p>{`Connected: ${connected ?? ''}`}</p>
+        Normal Deeplink for testing:
+        <a href="metamask://buy-crypto">Deeplink buy crypto</a>
       </div>
 
       {showSwitchChainDialog && (
