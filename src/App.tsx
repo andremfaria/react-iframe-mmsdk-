@@ -65,13 +65,13 @@ export const App = () => {
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
-      const currentChainId = await provider?.getChainId();
+      // const currentChainId = await provider?.getChainId();
       setResponse(accounts);
 
-      if (currentChainId && currentChainId !== lineaChainId) {
-        console.log('would switch to ', lineaChainId);
-        setShowSwitchChainDialog(true);
-      }
+      // if (currentChainId && currentChainId !== lineaChainId) {
+      //   console.log('would switch to ', lineaChainId);
+      //   setShowSwitchChainDialog(true);
+      // }
     } catch (err) {
       if (err instanceof Object) {
         setResponse(JSON.stringify(err));
