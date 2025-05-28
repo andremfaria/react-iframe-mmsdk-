@@ -4,7 +4,6 @@ import './App.css';
 
 const lineaChainId = '0xe708';
 
-
 const changeNetwork = async ({provider, hexChainId}: {provider: SDKProvider, hexChainId: string}) => {
   console.debug(`switching to network chainId=${hexChainId}`);
   try {
@@ -61,7 +60,6 @@ export const App = () => {
   const [response, setResponse] = useState<unknown>('');
   const [showSwitchChainDialog, setShowSwitchChainDialog] = useState(false);
   const { sdk, connected, connecting, provider, chainId, account, balance } = useSDK();
-
   const connect = async () => {
     try {
       const accounts = await sdk?.connect();
@@ -132,6 +130,19 @@ export const App = () => {
       });
   };
 
+  const testBatchConnectAndSwitch = async () => {
+    const requests = [{
+      method: "eth_requestAccounts", // This is a valid Ethereum RPC method to request account access
+      params: []
+  },
+  {
+      method: "wallet_switchEthereumChain", // This is a valid MetaMask-specific method to switch networks
+      params: [{ chainId: "0x1" }] // chainId should be a hex string like "0x1" for mainnet
+  }
+  ]
+   await sdk?.getProvider()?.request(requests[1])
+  }
+
   return (
     <div className="App">
       <h1>Vite React MMSDK Example</h1>
@@ -156,6 +167,9 @@ export const App = () => {
         )}
       </div>
 
+      <button className={'Button-Normal'} style={{ padding: 10, margin: 10 }} onClick={testBatchConnectAndSwitch}>
+            Test batch connect and switch
+          </button>
       {connected ? (  
         <div className="Button-Container">
           <button className={'Button-Normal'} style={{ padding: 10, margin: 10 }} onClick={connect}>
