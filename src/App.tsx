@@ -1,6 +1,7 @@
 import { SDKProvider, useSDK } from '@metamask/sdk-react';
 import { useState } from 'react';
 import './App.css';
+import { Buffer } from 'buffer';
 
 const lineaChainId = '0xe708';
 
@@ -55,14 +56,18 @@ function SwitchChainDialog({ onDismiss }: { onDismiss: () => void }) {
     </div>
   )
 }
-
 export const App = () => {
+ 
+
   const [response, setResponse] = useState<unknown>('');
   const [showSwitchChainDialog, setShowSwitchChainDialog] = useState(false);
   const { sdk, connected, connecting, provider, chainId, account, balance } = useSDK();
+
   const connect = async () => {
     try {
+      console.log("before connect")
       const accounts = await sdk?.connect();
+      console.log("after connect")
       // const currentChainId = await provider?.getChainId();
       setResponse(accounts);
 
@@ -140,7 +145,20 @@ export const App = () => {
       params: [{ chainId: "0x1" }] // chainId should be a hex string like "0x1" for mainnet
   }
   ]
-   await sdk?.getProvider()?.request(requests[1])
+    await sdk?.connectWith(requests[1])
+  }
+
+
+  const signMessageHandler = async () => {
+    const message = 'Hello, world!'
+    const hexMessage = "0x" + Buffer.from(message).toString('hex')
+    console.log("hexMessage ends:", hexMessage)
+    const signature = await sdk?.getProvider()?.request({
+      method: "personal_sign",
+      params: [hexMessage, account]
+    })
+    console.log("signature ends:", signature)
+    setResponse(signature)
   }
 
   return (
@@ -170,6 +188,9 @@ export const App = () => {
       <button className={'Button-Normal'} style={{ padding: 10, margin: 10 }} onClick={testBatchConnectAndSwitch}>
             Test batch connect and switch
           </button>
+          {connected && <button className={'Button-Normal'} style={{ padding: 10, margin: 10 }} onClick={signMessageHandler}>
+            Sign message
+          </button>}
       {connected ? (  
         <div className="Button-Container">
           <button className={'Button-Normal'} style={{ padding: 10, margin: 10 }} onClick={connect}>
