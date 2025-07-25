@@ -153,11 +153,12 @@ export const App = () => {
     const message = 'Hello, world!'
     const hexMessage = "0x" + Buffer.from(message).toString('hex')
     console.log("hexMessage ends:", hexMessage)
+    console.log("[signMessageHandler] before signing...")
     const signature = await sdk?.getProvider()?.request({
       method: "personal_sign",
       params: [hexMessage, account]
     })
-    console.log("signature ends:", signature)
+    console.log("[signMessageHandler] after signing...")
     setResponse(signature)
   }
 
