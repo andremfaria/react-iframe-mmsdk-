@@ -14,7 +14,7 @@ const sdkOptions = {
   logging: {
     developerMode: false
   },
-  forceInjectedProvider: true,
+  forceInjectedProvider: false,
   openDeeplink(link: string) {
     const isInIframe = window !== window.parent;
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
